@@ -1,5 +1,8 @@
 import { Module } from '@nestjs/common';
-import { ConfigService, ConfigModule as NestConfigModule } from '@nestjs/config';
+import {
+  ConfigService,
+  ConfigModule as NestConfigModule,
+} from '@nestjs/config';
 import { validate } from './env.validation';
 
 @Module({
@@ -10,6 +13,6 @@ import { validate } from './env.validation';
     }),
   ],
   providers: [ConfigService],
-  exports: [ConfigService]
+  exports: [ConfigService],
 })
 export class ConfigModule {}
