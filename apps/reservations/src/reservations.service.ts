@@ -18,15 +18,18 @@ export class ReservationsService {
   }
 
   async findAll() {
-    return await this.reservationsRepository.find({})
+    return await this.reservationsRepository.find({});
   }
 
   async findOne(id: string) {
-    return await this.reservationsRepository.findOne({ _id: id});
+    return await this.reservationsRepository.findOne({ _id: id });
   }
 
   async update(id: string, updateReservationDto: UpdateReservationDto) {
-    return await this.reservationsRepository.findOneAndUpdate({ _id: id}, { $set: updateReservationDto });
+    return await this.reservationsRepository.findOneAndUpdate(
+      { _id: id },
+      { $set: updateReservationDto },
+    );
   }
 
   async remove(id: string) {
