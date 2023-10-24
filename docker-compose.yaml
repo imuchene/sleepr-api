@@ -9,6 +9,16 @@ services:
       - '3001:3001'
     volumes:
       - .:/usr/src/app
+  auth:
+    build: 
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+      target: development
+    command: pnpm start:dev auth
+    ports:
+      - '3002:3002'
+    volumes:
+      - .:/usr/src/app
   mongo:
     image: mongo
     env_file:
