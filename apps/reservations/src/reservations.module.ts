@@ -9,10 +9,17 @@ import {
   ReservationSchema,
 } from './models/reservation.schema';
 import { LoggerModule } from '@app/common/logger/logger.module';
+import * as Joi from 'joi';
 
 @Module({
   imports: [
-    ConfigModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validationSchema: Joi.object({
+        PORT: Joi.number().required(),
+        MONGODB_URI: Joi.string().required(),
+      }),
+    }),
     DatabaseModule,
     DatabaseModule.forFeature([
       { name: ReservationDocument.name, schema: ReservationSchema },

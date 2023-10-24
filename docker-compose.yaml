@@ -5,6 +5,8 @@ services:
       dockerfile: ./apps/reservations/Dockerfile
       target: development
     command: pnpm start:dev reservations
+    env_file:
+      - ./apps/reservations/.env
     ports:
       - '3001:3001'
     volumes:
@@ -15,11 +17,11 @@ services:
       dockerfile: ./apps/auth/Dockerfile
       target: development
     command: pnpm start:dev auth
+    env_file:
+      - ./apps/auth/.env
     ports:
       - '3002:3002'
     volumes:
       - .:/usr/src/app
   mongo:
     image: mongo
-    env_file:
-      - .env 
