@@ -17,6 +17,7 @@ export class AuthService {
     };
 
     const expires = new Date();
+
     expires.setSeconds(
       expires.getSeconds() + this.configService.get<number>('JWT_EXPIRATION'),
     );

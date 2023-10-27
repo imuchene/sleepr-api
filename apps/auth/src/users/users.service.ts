@@ -1,19 +1,23 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersRepository } from './users.repository';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
 
   async create(createUserDto: CreateUserDto) {
-    const salt = await bcrypt.genSalt();
+    try {
+      const salt = await bcrypt.genSalt();
 
-    return await this.usersRepository.create({
-      ...createUserDto,
-      password: await bcrypt.hash(createUserDto.password, salt),
-    });
+      return this.usersRepository.create({
+        ...createUserDto,
+        password: await bcrypt.hash(createUserDto.password, salt),
+      });
+    } catch (error) {
+      Logger.error('[usersService] error', error);
+    }
   }
 
   async verifyUser(email: string, password: string) {
