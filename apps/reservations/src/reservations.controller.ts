@@ -21,8 +21,14 @@ export class ReservationsController {
   constructor(private readonly reservationsService: ReservationsService) {}
 
   @Post()
-  async create(@Body() createReservationDto: CreateReservationDto, @CurrentUser() user: UserDto) {
-    return await this.reservationsService.create(createReservationDto, user._id);
+  async create(
+    @Body() createReservationDto: CreateReservationDto,
+    @CurrentUser() user: UserDto,
+  ) {
+    return await this.reservationsService.create(
+      createReservationDto,
+      user._id,
+    );
   }
 
   @Get()
