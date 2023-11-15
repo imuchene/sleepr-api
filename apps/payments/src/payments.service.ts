@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 import { CreateChargeDto } from '../../../libs/common/src/dto/create-charge.dto';
@@ -14,20 +14,20 @@ export class PaymentsService {
     },
   );
 
-  async createCharge({ card, amount }: CreateChargeDto) {
-    const paymentMethod = await this.stripe.paymentMethods.create({
-      type: 'card',
-      card,
-    });
+  async createCharge({ amount }: CreateChargeDto) {
+    try {
+      const paymentIntent = await this.stripe.paymentIntents.create({
+        amount: amount * 100,
+        payment_method: 'pm_card_visa',
+        currency: 'usd',
+        confirm: true,
+        payment_method_types: ['card'],
+      });
 
-    const paymentIntent = await this.stripe.paymentIntents.create({
-      payment_method: paymentMethod.id,
-      amount: amount * 100,
-      confirm: true,
-      payment_method_types: ['card'],
-      currency: 'usd',
-    });
-
-    return paymentIntent;
+      return paymentIntent;
+    } catch (error) {
+      console.error('stripe error', error);
+      throw new UnprocessableEntityException('Error with the stripe payment');
+    }
   }
 }
