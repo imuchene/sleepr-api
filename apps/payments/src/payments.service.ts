@@ -1,11 +1,21 @@
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
-import { CreateChargeDto } from '../../../libs/common/src/dto/create-charge.dto';
+import { ServicesEnum } from '@app/common/constants/services.enum';
+import { ClientProxy } from '@nestjs/microservices';
+import { PaymentsCreateChargeDto } from './dto/payments-create-charge.dto';
 
 @Injectable()
 export class PaymentsService {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    @Inject(ServicesEnum.NOTIFICATIONS_SERVICE)
+    private readonly notificationsService: ClientProxy,
+  ) {}
 
   private readonly stripe = new Stripe(
     this.configService.get('STRIPE_SECRET_KEY'),
@@ -14,7 +24,7 @@ export class PaymentsService {
     },
   );
 
-  async createCharge({ amount }: CreateChargeDto) {
+  async createCharge({ amount, email }: PaymentsCreateChargeDto) {
     try {
       const paymentIntent = await this.stripe.paymentIntents.create({
         amount: amount * 100,
@@ -23,6 +33,8 @@ export class PaymentsService {
         confirm: true,
         payment_method_types: ['card'],
       });
+
+      this.notificationsService.emit('notify_email', { email });
 
       return paymentIntent;
     } catch (error) {

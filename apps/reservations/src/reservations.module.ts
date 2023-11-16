@@ -11,7 +11,7 @@ import {
 import { LoggerModule } from '@app/common/logger/logger.module';
 import * as Joi from 'joi';
 import { ClientsModule } from '@nestjs/microservices';
-import { AUTH_SERVICE, PAYMENTS_SERVICE } from '@app/common/constants/services';
+import { ServicesEnum } from '@app/common/constants/services.enum';
 
 @Module({
   imports: [
@@ -33,7 +33,7 @@ import { AUTH_SERVICE, PAYMENTS_SERVICE } from '@app/common/constants/services';
     LoggerModule,
     ClientsModule.registerAsync([
       {
-        name: AUTH_SERVICE,
+        name: ServicesEnum.AUTH_SERVICE,
         inject: [ConfigService],
         useFactory: (configService: ConfigService) => ({
           options: {
@@ -43,7 +43,7 @@ import { AUTH_SERVICE, PAYMENTS_SERVICE } from '@app/common/constants/services';
         }),
       },
       {
-        name: PAYMENTS_SERVICE,
+        name: ServicesEnum.PAYMENTS_SERVICE,
         inject: [ConfigService],
         useFactory: (configService: ConfigService) => ({
           options: {

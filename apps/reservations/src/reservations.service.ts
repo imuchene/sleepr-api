@@ -2,24 +2,26 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { ReservationsRepository } from './reservations.repository';
-import { PAYMENTS_SERVICE } from '@app/common/constants/services';
 import { ClientProxy } from '@nestjs/microservices';
 import { map } from 'rxjs';
 import Stripe from 'stripe';
+import { ServicesEnum } from '@app/common/constants/services.enum';
+import { UserDto } from '@app/common/dto/user.dto';
 
 @Injectable()
 export class ReservationsService {
   constructor(
     private readonly reservationsRepository: ReservationsRepository,
-    @Inject(PAYMENTS_SERVICE) private readonly paymentsService: ClientProxy,
+    @Inject(ServicesEnum.PAYMENTS_SERVICE)
+    private readonly paymentsService: ClientProxy,
   ) {}
 
   async create(
     createReservationDto: CreateReservationDto,
-    userId: string,
+    { email, _id: userId }: UserDto,
   ): Promise<any> {
     return this.paymentsService
-      .send('create_charge', createReservationDto.charge)
+      .send('create_charge', { ...createReservationDto.charge, email })
       .pipe(
         map((res: Stripe.PaymentIntent) => {
           return this.reservationsRepository.create({
