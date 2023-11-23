@@ -4,7 +4,6 @@ import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { ReservationsRepository } from './reservations.repository';
 import { ClientProxy } from '@nestjs/microservices';
 import { map } from 'rxjs';
-import Stripe from 'stripe';
 import { ServicesEnum } from '@app/common/constants/services.enum';
 import { UserDto } from '@app/common/dto/user.dto';
 
@@ -23,7 +22,7 @@ export class ReservationsService {
     return this.paymentsService
       .send('create_charge', { ...createReservationDto.charge, email })
       .pipe(
-        map((res: Stripe.PaymentIntent) => {
+        map((res: any) => {
           return this.reservationsRepository.create({
             ...createReservationDto,
             invoiceId: res.id,
