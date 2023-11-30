@@ -36,3 +36,6 @@ lerna-debug.log*
 
 # Ignore env files
 .env
+
+# Ignore GCP service accounts
+sleepr-service-account.json
