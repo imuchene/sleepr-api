@@ -12,6 +12,7 @@ import { LoggerModule } from '@app/common/logger/logger.module';
 import * as Joi from 'joi';
 import { ClientsModule } from '@nestjs/microservices';
 import { ServicesEnum } from '@app/common/constants/services.enum';
+import { HealthModule } from '@app/common/health/health.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { ServicesEnum } from '@app/common/constants/services.enum';
         }),
       },
     ]),
+    HealthModule,
   ],
   controllers: [ReservationsController],
   providers: [ReservationsService, ReservationsRepository],
