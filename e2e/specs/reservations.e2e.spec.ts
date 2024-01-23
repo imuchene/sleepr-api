@@ -4,7 +4,7 @@ describe('Reservations', () => {
   beforeAll(async () => {
     const user = {
       email: 'sleeprnestapp@gmail.com',
-      password: 'StrongPassword!@',
+      password: 'StrongPassword123!@',
     };
 
     await fetch('http://auth:3002/users', {
@@ -24,12 +24,23 @@ describe('Reservations', () => {
     });
 
     jwt = await response.text();
-
-    console.log('jwt', jwt);
   });
 
-  test('Create', async () => {
-    const response = await fetch('http://reservations:3001/reservations', {
+  test('Create & Get a Reservation', async () => {
+    const createdReservation = await createReservation();
+    const responseGet = await fetch(`http://reservations:3001/reservations/${createdReservation._id}`, {
+      headers: {
+        Authentication: jwt,
+      }
+    });
+
+    const reservation = await responseGet.json();
+
+    expect(createdReservation).toEqual(reservation);
+  });
+
+  const createReservation = async () => {
+    const responseCreate = await fetch('http://reservations:3001/reservations', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -52,8 +63,8 @@ describe('Reservations', () => {
       }),
     });
 
-    expect(response.ok).toBeTruthy();
-    const reservation = await response.json();
-    console.log(reservation);
-  });
+    expect(responseCreate.ok).toBeTruthy();
+   return await responseCreate.json();
+
+  }
 });
