@@ -4,10 +4,7 @@ import { ReservationsController } from './reservations.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DatabaseModule } from '@app/common';
 import { ReservationsRepository } from './reservations.repository';
-import {
-  ReservationDocument,
-  ReservationSchema,
-} from './models/reservation.schema';
+import { Reservation } from './models/reservation.entity';
 import { LoggerModule } from '@app/common/logger/logger.module';
 import * as Joi from 'joi';
 import { ClientsModule } from '@nestjs/microservices';
@@ -28,9 +25,7 @@ import { HealthModule } from '@app/common/health/health.module';
       }),
     }),
     DatabaseModule,
-    DatabaseModule.forFeature([
-      { name: ReservationDocument.name, schema: ReservationSchema },
-    ]),
+    DatabaseModule.forFeature([Reservation]),
     LoggerModule,
     ClientsModule.registerAsync([
       {

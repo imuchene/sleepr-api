@@ -6,6 +6,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { map } from 'rxjs';
 import { ServicesEnum } from '@app/common/constants/services.enum';
 import { UserDto } from '@app/common/dto/user.dto';
+import { Reservation } from './models/reservation.entity';
 
 @Injectable()
 export class ReservationsService {
@@ -23,12 +24,14 @@ export class ReservationsService {
       .send('create_charge', { ...createReservationDto.charge, email })
       .pipe(
         map((res: any) => {
-          return this.reservationsRepository.create({
+          const reservation = new Reservation({
             ...createReservationDto,
             invoiceId: res.id,
             timestamp: new Date(),
             userId,
           });
+
+          return this.reservationsRepository.create(reservation);
         }),
       );
   }
@@ -37,18 +40,18 @@ export class ReservationsService {
     return await this.reservationsRepository.find({});
   }
 
-  async findOne(id: string) {
-    return await this.reservationsRepository.findOne({ _id: id });
+  async findOne(id: number) {
+    return await this.reservationsRepository.findOne({ id });
   }
 
-  async update(id: string, updateReservationDto: UpdateReservationDto) {
+  async update(id: number, updateReservationDto: UpdateReservationDto) {
     return await this.reservationsRepository.findOneAndUpdate(
-      { _id: id },
-      { $set: updateReservationDto },
+      { id },
+      updateReservationDto,
     );
   }
 
-  async remove(id: string) {
-    return await this.reservationsRepository.findOneAndDelete({ _id: id });
+  async remove(id: number) {
+    return await this.reservationsRepository.findOneAndDelete({ id });
   }
 }
