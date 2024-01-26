@@ -5,8 +5,8 @@ import { ReservationsRepository } from './reservations.repository';
 import { ClientProxy } from '@nestjs/microservices';
 import { map } from 'rxjs';
 import { ServicesEnum } from '@app/common/constants/services.enum';
-import { UserDto } from '@app/common/dto/user.dto';
 import { Reservation } from './models/reservation.entity';
+import { User } from '@app/common/models/user.entity';
 
 @Injectable()
 export class ReservationsService {
@@ -18,7 +18,7 @@ export class ReservationsService {
 
   async create(
     createReservationDto: CreateReservationDto,
-    { email, _id: userId }: UserDto,
+    { email, id: userId }: User,
   ): Promise<any> {
     return this.paymentsService
       .send('create_charge', { ...createReservationDto.charge, email })
