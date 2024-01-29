@@ -10,7 +10,7 @@ import {
 } from './models/reservation.schema';
 import { LoggerModule } from '@app/common/logger/logger.module';
 import * as Joi from 'joi';
-import { ClientsModule } from '@nestjs/microservices';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ServicesEnum } from '@app/common/constants/services.enum';
 import { HealthModule } from '@app/common/health/health.module';
 
@@ -37,9 +37,10 @@ import { HealthModule } from '@app/common/health/health.module';
         name: ServicesEnum.AUTH_SERVICE,
         inject: [ConfigService],
         useFactory: (configService: ConfigService) => ({
+          transport: Transport.RMQ,
           options: {
-            host: configService.get('AUTH_HOST'),
-            port: configService.get<number>('AUTH_PORT'),
+            urls: [configService.getOrThrow<string>('RABBITMQ_URI')],
+            queue: 'auth',
           },
         }),
       },
@@ -47,9 +48,10 @@ import { HealthModule } from '@app/common/health/health.module';
         name: ServicesEnum.PAYMENTS_SERVICE,
         inject: [ConfigService],
         useFactory: (configService: ConfigService) => ({
+          transport: Transport.RMQ,
           options: {
-            host: configService.get('PAYMENTS_HOST'),
-            port: configService.get<number>('PAYMENTS_PORT'),
+            urls: [configService.getOrThrow<string>('RABBITMQ_URI')],
+            queue: 'payments',
           },
         }),
       },
