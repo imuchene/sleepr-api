@@ -8,8 +8,9 @@ import { EntityClassOrSchema } from '@nestjs/typeorm/dist/interfaces/entity-clas
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
+        type: 'mysql',
         host: configService.getOrThrow<string>('MYSQL_HOST'),
-        port: configService.getOrThrow<string>('MYSQL_PORT'),
+        port: configService.getOrThrow<number>('MYSQL_PORT'),
         database: configService.getOrThrow<string>('MYSQL_DATABASE'),
         username: configService.getOrThrow<string>('MYSQL_USERNAME'),
         password: configService.getOrThrow<string>('MYSQL_PASSWORD'),
