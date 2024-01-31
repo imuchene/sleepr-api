@@ -4,22 +4,29 @@ import {
   Inject,
   Injectable,
   Logger,
+  OnModuleInit,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientGrpc } from '@nestjs/microservices';
 import { Observable, catchError, map, of, tap } from 'rxjs';
-import { UserDto } from '../dto/user.dto';
-import { ServicesEnum } from '@app/common/constants/services.enum';
 import { Reflector } from '@nestjs/core';
+import { AUTH_SERVICE_NAME, AuthServiceClient } from '../types/auth';
 
 @Injectable()
-export class JwtAuthGuard implements CanActivate {
+export class JwtAuthGuard implements CanActivate, OnModuleInit {
   private readonly logger = new Logger(JwtAuthGuard.name);
+  private authService: AuthServiceClient;
+
+
   constructor(
-    @Inject(ServicesEnum.AUTH_SERVICE)
-    private readonly authClient: ClientProxy,
+    @Inject(AUTH_SERVICE_NAME)
+    private readonly client: ClientGrpc,
     private readonly reflector: Reflector,
   ) {}
+
+  onModuleInit() {
+    this.authService = this.client.getService<AuthServiceClient>(AUTH_SERVICE_NAME)
+  }
 
   canActivate(
     context: ExecutionContext,
@@ -34,13 +41,12 @@ export class JwtAuthGuard implements CanActivate {
 
     const roles = this.reflector.get<string[]>('roles', context.getHandler());
 
-    return this.authClient
-      .send<UserDto>('authenticate', {
+    return this.authService
+      .authenticate({
         Authentication: jwt,
       })
       .pipe(
         tap((res) => {
-
           if (roles) {
             for (const role of roles) {
               if (!res.roles?.includes(role)) {
@@ -49,12 +55,12 @@ export class JwtAuthGuard implements CanActivate {
               }
             }
           }
-          context.switchToHttp().getRequest().user = res;
+          context.switchToHttp().getRequest().user = { ...res, _id: res.id };
         }),
         map(() => true),
         catchError((error) => {
           this.logger.error(error);
-          return of(false)
+          return of(false);
         }),
       );
   }
