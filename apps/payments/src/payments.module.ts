@@ -4,30 +4,32 @@ import { PaymentsService } from './payments.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { LoggerModule } from '@app/common/logger/logger.module';
-import { ServicesEnum } from '@app/common/constants/services.enum';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { join } from 'path';
+import {
+  NOTIFICATIONS_PACKAGE_NAME,
+  NOTIFICATIONS_SERVICE_NAME,
+} from '@app/common/types/notifications';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
-        PORT: Joi.number().required(),
         STRIPE_SECRET_KEY: Joi.string().required(),
-        NOTIFICATIONS_HOST: Joi.string().required(),
-        NOTIFICATIONS_PORT: Joi.number().required(),
       }),
     }),
     LoggerModule,
     ClientsModule.registerAsync([
       {
-        name: ServicesEnum.NOTIFICATIONS_SERVICE,
+        name: NOTIFICATIONS_SERVICE_NAME,
         inject: [ConfigService],
         useFactory: (configService: ConfigService) => ({
-          transport: Transport.TCP,
+          transport: Transport.GRPC,
           options: {
-            host: configService.get('NOTIFICATIONS_HOST'),
-            port: configService.get<number>('NOTIFICATIONS_PORT'),
+            protoPath: join(__dirname, '../../../proto/notifications.proto'),
+            package: NOTIFICATIONS_PACKAGE_NAME,
+            url: configService.getOrThrow('NOTIFICATIONS_GRPC_URL'),
           },
         }),
       },

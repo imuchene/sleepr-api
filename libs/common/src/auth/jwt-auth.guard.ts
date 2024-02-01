@@ -17,7 +17,6 @@ export class JwtAuthGuard implements CanActivate, OnModuleInit {
   private readonly logger = new Logger(JwtAuthGuard.name);
   private authService: AuthServiceClient;
 
-
   constructor(
     @Inject(AUTH_SERVICE_NAME)
     private readonly client: ClientGrpc,
@@ -25,7 +24,8 @@ export class JwtAuthGuard implements CanActivate, OnModuleInit {
   ) {}
 
   onModuleInit() {
-    this.authService = this.client.getService<AuthServiceClient>(AUTH_SERVICE_NAME)
+    this.authService =
+      this.client.getService<AuthServiceClient>(AUTH_SERVICE_NAME);
   }
 
   canActivate(

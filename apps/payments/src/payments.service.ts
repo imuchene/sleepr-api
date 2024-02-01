@@ -5,16 +5,21 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
-import { ServicesEnum } from '@app/common/constants/services.enum';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientGrpc } from '@nestjs/microservices';
 import { PaymentsCreateChargeDto } from './dto/payments-create-charge.dto';
+import {
+  NOTIFICATIONS_SERVICE_NAME,
+  NotificationsServiceClient,
+} from '@app/common/types/notifications';
 
 @Injectable()
 export class PaymentsService {
+  private notificationsService: NotificationsServiceClient;
+
   constructor(
     private readonly configService: ConfigService,
-    @Inject(ServicesEnum.NOTIFICATIONS_SERVICE)
-    private readonly notificationsService: ClientProxy,
+    @Inject(NOTIFICATIONS_SERVICE_NAME)
+    private readonly client: ClientGrpc,
   ) {}
 
   private readonly stripe = new Stripe(
@@ -34,7 +39,14 @@ export class PaymentsService {
         payment_method_types: ['card'],
       });
 
-      this.notificationsService.emit('notify_email', {
+      if (!this.notificationsService) {
+        this.notificationsService =
+          this.client.getService<NotificationsServiceClient>(
+            NOTIFICATIONS_SERVICE_NAME,
+          );
+      }
+
+      this.notificationsService.notifyEmail({
         email,
         text: `Your payment of $${amount} has completed successfully.`,
       });

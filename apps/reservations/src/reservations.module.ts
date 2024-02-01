@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ReservationsService } from './reservations.service';
 import { ReservationsController } from './reservations.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { DatabaseModule } from '@app/common';
+import { DatabaseModule } from '@app/common/database/database.module';
 import { ReservationsRepository } from './reservations.repository';
 import {
   ReservationDocument,
@@ -10,21 +10,21 @@ import {
 } from './models/reservation.schema';
 import { LoggerModule } from '@app/common/logger/logger.module';
 import * as Joi from 'joi';
-import { ClientsModule } from '@nestjs/microservices';
-import { ServicesEnum } from '@app/common/constants/services.enum';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { HealthModule } from '@app/common/health/health.module';
+import { AUTH_PACKAGE_NAME, AUTH_SERVICE_NAME } from '@app/common/types/auth';
+import { join } from 'path';
+import {
+  PAYMENTS_PACKAGE_NAME,
+  PAYMENTS_SERVICE_NAME,
+} from '@app/common/types/payments';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
-        PORT: Joi.number().required(),
         MONGODB_URI: Joi.string().required(),
-        AUTH_HOST: Joi.string().required(),
-        AUTH_PORT: Joi.number().required(),
-        PAYMENTS_HOST: Joi.string().required(),
-        PAYMENTS_PORT: Joi.number().required(),
       }),
     }),
     DatabaseModule,
@@ -34,22 +34,26 @@ import { HealthModule } from '@app/common/health/health.module';
     LoggerModule,
     ClientsModule.registerAsync([
       {
-        name: ServicesEnum.AUTH_SERVICE,
+        name: AUTH_SERVICE_NAME,
         inject: [ConfigService],
         useFactory: (configService: ConfigService) => ({
+          transport: Transport.GRPC,
           options: {
-            host: configService.get('AUTH_HOST'),
-            port: configService.get<number>('AUTH_PORT'),
+            package: AUTH_PACKAGE_NAME,
+            protoPath: join(__dirname, '../../../proto/auth.proto'),
+            url: configService.getOrThrow('AUTH_GRPC_URL'),
           },
         }),
       },
       {
-        name: ServicesEnum.PAYMENTS_SERVICE,
+        name: PAYMENTS_SERVICE_NAME,
         inject: [ConfigService],
         useFactory: (configService: ConfigService) => ({
+          transport: Transport.GRPC,
           options: {
-            host: configService.get('PAYMENTS_HOST'),
-            port: configService.get<number>('PAYMENTS_PORT'),
+            package: PAYMENTS_PACKAGE_NAME,
+            protoPath: join(__dirname, '../../../proto/payments.proto'),
+            url: configService.getOrThrow('PAYMENTS_GRPC_URL'),
           },
         }),
       },
