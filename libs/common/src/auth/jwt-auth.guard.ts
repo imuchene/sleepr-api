@@ -40,7 +40,6 @@ export class JwtAuthGuard implements CanActivate {
       })
       .pipe(
         tap((res) => {
-
           if (roles) {
             for (const role of roles) {
               if (!res.roles?.includes(role)) {
@@ -54,7 +53,7 @@ export class JwtAuthGuard implements CanActivate {
         map(() => true),
         catchError((error) => {
           this.logger.error(error);
-          return of(false)
+          return of(false);
         }),
       );
   }
