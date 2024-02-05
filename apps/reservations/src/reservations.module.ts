@@ -13,6 +13,12 @@ import * as Joi from 'joi';
 import { ClientsModule } from '@nestjs/microservices';
 import { ServicesEnum } from '@app/common/constants/services.enum';
 import { HealthModule } from '@app/common/health/health.module';
+import { GraphQLModule } from '@nestjs/graphql';
+import {
+  ApolloFederationDriver,
+  ApolloFederationDriverConfig,
+} from '@nestjs/apollo';
+import { ReservationsResolver } from './reservations.resolver';
 
 @Module({
   imports: [
@@ -31,6 +37,12 @@ import { HealthModule } from '@app/common/health/health.module';
     DatabaseModule.forFeature([
       { name: ReservationDocument.name, schema: ReservationSchema },
     ]),
+    GraphQLModule.forRoot<ApolloFederationDriverConfig>({
+      driver: ApolloFederationDriver,
+      autoSchemaFile: {
+        federation: 2,
+      },
+    }),
     LoggerModule,
     ClientsModule.registerAsync([
       {
@@ -57,6 +69,10 @@ import { HealthModule } from '@app/common/health/health.module';
     HealthModule,
   ],
   controllers: [ReservationsController],
-  providers: [ReservationsService, ReservationsRepository],
+  providers: [
+    ReservationsService,
+    ReservationsRepository,
+    ReservationsResolver,
+  ],
 })
 export class ReservationsModule {}
