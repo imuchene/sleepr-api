@@ -5,7 +5,7 @@ const getCurrentUserByContext = (context: ExecutionContext): UserDocument => {
   if (context.getType() === 'http') {
     return context.switchToHttp().getRequest().user;
   }
-  const user = context.getArgs()[2]?.request.headers?.user;
+  const user = context.getArgs()[2]?.req.headers?.user;
 
   if (user) {
     return JSON.parse(user);
