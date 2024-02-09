@@ -24,7 +24,7 @@ export class PaymentsService {
     },
   );
 
-  async createCharge({ amount, email }: PaymentsCreateChargeDto) {
+  async createCharge({ amount, email }: PaymentsCreateChargeDto): Promise<Stripe.PaymentIntent> {
     try {
       const paymentIntent = await this.stripe.paymentIntents.create({
         amount: amount * 100,
@@ -44,5 +44,10 @@ export class PaymentsService {
       console.error('stripe error', error);
       throw new UnprocessableEntityException('Error with the stripe payment');
     }
+  }
+
+  async getPayments(): Promise<Stripe.PaymentIntent[]>{
+    const payments = await this.stripe.paymentIntents.list();
+    return payments.data;
   }
 }
