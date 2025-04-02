@@ -35,7 +35,7 @@ lerna-debug.log*
 !.vscode/extensions.json
 
 # Ignore env files
-.env
+*.env*
 
 # Ignore GCP service accounts
 sleepr-service-account.json
