@@ -11,7 +11,8 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/apps/sleepr-api/main",
+    "start:prod": "pnpm run migrate && node",
+    "migrate": "pnpm prisma migrate deploy",
     "lint": "eslint \"{src,apps,libs,test,e2e}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -37,7 +38,8 @@
     "pino-http": "^8.5.0",
     "pino-pretty": "^10.2.3",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "prisma": "^6.5.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

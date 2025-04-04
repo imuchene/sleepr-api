@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { Observable, catchError, map, of, tap } from 'rxjs';
-import { UserDto } from '../dto/user.dto';
+import { User } from '../interfaces/user.interface';
 import { ServicesEnum } from '@app/common/constants/services.enum';
 import { Reflector } from '@nestjs/core';
 
@@ -35,12 +35,11 @@ export class JwtAuthGuard implements CanActivate {
     const roles = this.reflector.get<string[]>('roles', context.getHandler());
 
     return this.authClient
-      .send<UserDto>('authenticate', {
+      .send<User>('authenticate', {
         Authentication: jwt,
       })
       .pipe(
         tap((res) => {
-
           if (roles) {
             for (const role of roles) {
               if (!res.roles?.includes(role)) {
@@ -54,7 +53,7 @@ export class JwtAuthGuard implements CanActivate {
         map(() => true),
         catchError((error) => {
           this.logger.error(error);
-          return of(false)
+          return of(false);
         }),
       );
   }

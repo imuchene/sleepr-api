@@ -2,17 +2,12 @@ import { Module } from '@nestjs/common';
 import { ReservationsService } from './reservations.service';
 import { ReservationsController } from './reservations.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { DatabaseModule } from '@app/common';
-import { ReservationsRepository } from './reservations.repository';
-import {
-  ReservationDocument,
-  ReservationSchema,
-} from './models/reservation.schema';
 import { LoggerModule } from '@app/common/logger/logger.module';
 import * as Joi from 'joi';
 import { ClientsModule } from '@nestjs/microservices';
 import { ServicesEnum } from '@app/common/constants/services.enum';
 import { HealthModule } from '@app/common/health/health.module';
+import { PrismaService } from './prisma.service';
 
 @Module({
   imports: [
@@ -20,17 +15,13 @@ import { HealthModule } from '@app/common/health/health.module';
       isGlobal: true,
       validationSchema: Joi.object({
         PORT: Joi.number().required(),
-        MONGODB_URI: Joi.string().required(),
+        DATABASE_URL: Joi.string().required(),
         AUTH_HOST: Joi.string().required(),
         AUTH_PORT: Joi.number().required(),
         PAYMENTS_HOST: Joi.string().required(),
         PAYMENTS_PORT: Joi.number().required(),
       }),
     }),
-    DatabaseModule,
-    DatabaseModule.forFeature([
-      { name: ReservationDocument.name, schema: ReservationSchema },
-    ]),
     LoggerModule,
     ClientsModule.registerAsync([
       {
@@ -57,6 +48,6 @@ import { HealthModule } from '@app/common/health/health.module';
     HealthModule,
   ],
   controllers: [ReservationsController],
-  providers: [ReservationsService, ReservationsRepository],
+  providers: [ReservationsService, PrismaService],
 })
 export class ReservationsModule {}
