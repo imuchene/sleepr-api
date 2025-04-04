@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "migrate": "dotenv -e .env.local -- pnpm prisma migrate dev"
   },
   "keywords": [],
   "author": "",
@@ -12,15 +13,17 @@
   "dependencies": {
     "@nestjs/jwt": "^10.1.1",
     "@nestjs/passport": "^10.0.2",
+    "@prisma/client": "^6.5.0",
     "bcryptjs": "^2.4.3",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "prisma": "^6.5.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.5",
     "@types/passport-jwt": "^3.0.11",
-    "@types/passport-local": "^1.0.37"
-
+    "@types/passport-local": "^1.0.37",
+    "dotenv-cli": "^8.0.0"
   }
 }

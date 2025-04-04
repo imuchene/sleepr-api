@@ -17,6 +17,7 @@ import { HealthModule } from '@app/common/health/health.module';
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
+        DATABASE_URL: Joi.string().required(),
         PORT: Joi.number().required(),
         JWT_SECRET: Joi.string().required(),
         JWT_EXPIRATION: Joi.string().required(),
