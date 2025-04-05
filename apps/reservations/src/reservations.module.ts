@@ -4,7 +4,7 @@ import { ReservationsController } from './reservations.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LoggerModule } from '@app/common/logger/logger.module';
 import * as Joi from 'joi';
-import { ClientsModule } from '@nestjs/microservices';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ServicesEnum } from '@app/common/constants/services.enum';
 import { HealthModule } from '@app/common/health/health.module';
 import { PrismaService } from './prisma.service';

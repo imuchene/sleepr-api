@@ -1,4 +1,4 @@
-FROM node:alpine As development
+FROM node:alpine as development
 
 WORKDIR /usr/src/app
 
@@ -7,9 +7,13 @@ COPY pnpm-lock.yaml ./
 COPY tsconfig.json tsconfig.json
 COPY nest-cli.json nest-cli.json
 
+COPY apps/auth/prisma ./prisma
+
 RUN npm install -g pnpm
 
 RUN pnpm install
+
+RUN pnpm prisma generate
 
 COPY apps/auth apps/auth
 COPY libs libs
@@ -34,7 +38,7 @@ RUN pnpm install --prod
 
 COPY --from=development /usr/src/app/dist ./dist
 
-CMD ["node", "dist/apps/auth/main"]
+CMD ["pnpm", "run", "start:prod", "dist/apps/auth/main"]
 
 
 
